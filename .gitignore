@@ -1,0 +1,37 @@
+# deps
+node_modules/
+.pnp.*
+.yarn/*
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# env / secrets — NEVER commit (public repo, real wallet keys at risk)
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+.twak/
+wallet.json
+
+# build
+dist/
+build/
+.next/
+out/
+coverage/
+artifacts/
+cache/
+
+# data
+*.db
+*.sqlite
+
+# misc
+.DS_Store
+*.log
+.turbo/
+.vercel/

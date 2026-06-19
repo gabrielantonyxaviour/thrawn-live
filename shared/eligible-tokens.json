@@ -1,0 +1,24 @@
+{
+  "_note": "149 eligible BEP-20 tickers, captured verbatim from the LIVE DoraHacks rules page on 2026-06-19. Trades outside this list DO NOT COUNT toward PnL. The page text contained a duplicate 'SLX' (removed here). This is a best-effort capture for the pre-trade allowlist guard — RE-CONFIRM the authoritative set against the competition contract 0x212c61b9b72c95d95bf29cf032f5e5635629aed5 at registration. Note: BNB native is the gas token and was not listed as a tradeable eligible ticker on the page.",
+  "source": "https://dorahacks.io/hackathon/bnbhack-twt-cmc/detail",
+  "capturedAt": "2026-06-19",
+  "competitionContract": "0x212c61b9b72c95d95bf29cf032f5e5635629aed5",
+  "stableDerieskTargets": ["USDT", "USDC", "DAI", "FDUSD", "TUSD"],
+  "tokens": [
+    "ETH", "USDT", "USDC", "XRP", "TRX", "DOGE", "ZEC", "ADA", "LINK", "BCH",
+    "DAI", "TON", "USD1", "USDe", "M", "LTC", "AVAX", "SHIB", "XAUt", "WLFI",
+    "H", "DOT", "UNI", "ASTER", "DEXE", "USDD", "ETC", "AAVE", "ATOM", "U",
+    "STABLE", "FIL", "INJ", "币安人生", "NIGHT", "FET", "TUSD", "BONK", "PENGU", "CAKE",
+    "SIREN", "LUNC", "ZRO", "KITE", "FDUSD", "BEAT", "PIEVERSE", "BTT", "NFT", "EDGE",
+    "FLOKI", "LDO", "B", "FF", "PENDLE", "NEX", "STG", "AXS", "TWT", "HOME",
+    "RAY", "COMP", "GWEI", "XCN", "GENIUS", "XPL", "BAT", "SKYAI", "APE", "IP",
+    "SFP", "TAG", "NXPC", "AB", "SAHARA", "1INCH", "CHEEMS", "BANANAS31", "RIVER", "MYX",
+    "RAVE", "SNX", "FORM", "LAB", "HTX", "USDf", "CTM", "BDX", "SLX", "UB",
+    "DUCKY", "FRAX", "BILL", "WFI", "KOGE", "ALE", "FRXUSD", "USDF", "GOMINING", "VCNT",
+    "GUA", "DUSD", "SMILEK", "0G", "BEAM", "MY", "SOON", "REAL", "Q", "AIOZ",
+    "ZIG", "YFI", "TAC", "lisUSD", "CYS", "ZAMA", "TRIA", "HUMA", "PLUME", "ZIL",
+    "XPR", "ZETA", "BabyDoge", "NILA", "ROSE", "VELO", "UAI", "BRETT", "OPEN", "BSB",
+    "TOSHI", "BAS", "ACH", "AXL", "LUR", "ELF", "KAVA", "APR", "IRYS", "EURI",
+    "XUSD", "BARD", "DUSK", "SUSHI", "PEAQ", "COAI", "BDCA", "XAUM"
+  ]
+}

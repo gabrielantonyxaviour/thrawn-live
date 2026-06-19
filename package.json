@@ -1,0 +1,17 @@
+{
+  "name": "thrawn-live",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Autonomous BSC trading agent that trades performance-weighted signal alpha behind a hard drawdown gate. BNB AI Trading Agent Edition.",
+  "scripts": {
+    "dev:mock": "tsx agent/src/index.ts",
+    "test": "node --import tsx --test agent/test/gate.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

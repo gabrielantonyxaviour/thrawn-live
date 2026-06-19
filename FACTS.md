@@ -1,11 +1,13 @@
 # Thrawn Live — verified build facts (checked 2026-06-19)
 
-## Deadlines / rules — CONFIRMED (with correction)
-- Build + submission window **Jun 3 → Jun 21, 2026**. **Hard lock = Jun 21 12:00 UTC = 17:30 IST.** (Runbook's "before Jun 22" is loose — the binding cutoff is Jun 21 17:30 IST.) On-chain registration rejected once trading opens.
-- Track 1 live trading **Jun 22–28**, judged on live PnL / total return.
-- **≥1 trade/day** (7 over the week) minimum.
-- **Max-drawdown cap = hard DQ** (blow it = disqualified regardless of PnL). ⚠️ The exact % only appears as "e.g. 30%" in press — **confirm on the live DoraHacks rules page before coding the gate.** Simulated transaction costs apply.
-- Registration is **on-chain** via a BSC smart contract recording each agent wallet address.
+## Deadlines / rules — CONFIRMED against the LIVE DoraHacks rules page (2026-06-19)
+- Build + submission window **Jun 3 → Jun 21, 2026**. **Hard lock = Jun 21 12:00 UTC = 17:30 IST.** Live page shows "Deadline 2026/06/21 19:00" (DoraHacks UTC+7) and header "1 day left for submission" as of 2026-06-19. **Track 1: register on-chain BEFORE the trading window opens Jun 22** — entries after it opens are rejected.
+- Track 1 live trading **Jun 22–28**, judged on live PnL / total return, hour-by-hour. Judging Jun 29–Jul 5, winners week of Jul 6.
+- **≥1 trade/day** (7 over the week) minimum to qualify. Must hold a **non-zero balance of in-scope assets at competition start** to be ranked.
+- **Any hour beginning with portfolio ≤ $1 is scored 0% for that hour** — don't get drained to dust; keep capital deployed.
+- **Max-drawdown cap = hard DQ.** ⚠️ RESOLVED: the exact % is **NOT publicly published** — even the canonical live rules page says verbatim *"max drawdown cap as a risk gate. Blow past the drawdown threshold (for example 30%) and you are disqualified."* The threshold is enforced by the competition contract. **Engineering decision: treat `drawdownCapPct` as runtime config (default 30, read from `twak compete`/contract at registration) and trip our OWN internal halt conservatively below it (`internalHaltPct`, e.g. 20%), de-risking to stables before we approach DQ.** Simulated transaction costs apply.
+- **Registration is via TWAK, NOT bnbagent** (correction): `twak compete register` (CLI) or MCP `competition_register` resolves the agent wallet address and submits the registration tx to the competition contract **`0x212c61b9b72c95d95bf29cf032f5e5635629aed5`** (bsctrace.com) on BSC. Also must register + submit the agent address on DoraHacks with a short strategy explanation. The **bnbagent ERC-8004 identity is a SEPARATE, sponsor-scoring action** — not the competition entry.
+- **Eligible tokens:** fixed list of **149 BEP-20 tickers** listed on CMC — captured verbatim to `shared/eligible-tokens.json` (ETH, USDT, USDC, XRP, CAKE, TWT, ASTER, AB, SAHARA, KOGE, …). **Trades outside the list don't count.** Stables for de-risk: USDT/USDC/DAI/FDUSD/TUSD.
 - Tracks/prizes: Track 1 "Autonomous Trading Agents" $24k (5 winners); Track 2 "Strategy Skills" $6k; 3 sponsor specials $2k each. Total $36k.
 - Host: https://dorahacks.io/hackathon/bnbhack-twt-cmc/detail · CMC co-hub coinmarketcap.com/api/hackathon/
 

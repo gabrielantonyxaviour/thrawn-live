@@ -1,0 +1,10 @@
+{
+  "network": "bsc-testnet",
+  "agentAddress": "0xC1c9220E874AF912d4aC26Eeb45d7fFB0c0DF6b5",
+  "agentId": 1453,
+  "transactionHash": "0xe7ec778f291759cba3a544841e18985622d8d0f736ed6bcf66ebd5d76105abf8",
+  "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+  "explorerTx": "https://testnet.bscscan.com/tx/0xe7ec778f291759cba3a544841e18985622d8d0f736ed6bcf66ebd5d76105abf8",
+  "explorerAddress": "https://testnet.bscscan.com/address/0xC1c9220E874AF912d4aC26Eeb45d7fFB0c0DF6b5",
+  "scan8004": "https://www.8004scan.io"
+}

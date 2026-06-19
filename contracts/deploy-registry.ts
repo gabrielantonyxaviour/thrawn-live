@@ -8,7 +8,7 @@
  * blocker rather than pretending a deployment happened — it never fabricates an address.
  * Re-targeted from the Agora Arc deployer (same viem + solc pattern).
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
@@ -78,6 +78,14 @@ function compile(): { abi: Abi; bytecode: Hex } {
 async function main() {
   const { abi, bytecode } = compile();
   console.log(`Compiled DecisionRegistry.sol (${abi.length} ABI entries) for ${CHAIN.name}.`);
+
+  // Emit the compiled artifact for the Python MegaFuel-sponsored deployer (gas-free testnet path).
+  if (process.env.EMIT_ARTIFACT) {
+    const artifactPath = join(here, "DecisionRegistry.json");
+    writeFileSync(artifactPath, JSON.stringify({ abi, bytecode }, null, 2));
+    console.log(`Wrote artifact → ${artifactPath}`);
+    return;
+  }
 
   const privateKey = process.env.DEPLOYER_PRIVATE_KEY;
   if (!privateKey || !/^0x[0-9a-fA-F]{64}$/.test(privateKey)) {

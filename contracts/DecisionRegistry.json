@@ -1,0 +1,134 @@
+{
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "id",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "recorder",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "kind",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "evidenceHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "recordedAt",
+          "type": "uint256"
+        }
+      ],
+      "name": "DecisionRecorded",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "decisionCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lastDecisionId",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lastEvidenceHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "id",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "string",
+          "name": "kind",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "evidenceHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "recordDecision",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "recordedAt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600e575f5ffd5b506102748061001c5f395ff3fe608060405234801561000f575f5ffd5b5060043610610055575f3560e01c8063100b63cb146100595780631500e01a1461007357806346fb2ce41461007c578063bc23adb714610091578063e6bbb1c9146100b0575b5f5ffd5b6100615f5481565b60405190815260200160405180910390f35b61006160025481565b61008f61008a366004610135565b6100b9565b005b61006161009f3660046101bd565b60036020525f908152604090205481565b61006160015481565b60015f5f8282546100ca91906101d4565b9091555050600185905560028290555f858152600360205260409081902042908190559051339187917fe6e4d832d4e4242b579ed96799848658c67bdcc1da2498670aebe4fe27bff3e2916101269189918991899189916101f9565b60405180910390a35050505050565b5f5f5f5f5f60808688031215610149575f5ffd5b85359450602086013567ffffffffffffffff811115610166575f5ffd5b8601601f81018813610176575f5ffd5b803567ffffffffffffffff81111561018c575f5ffd5b88602082840101111561019d575f5ffd5b959860209190910197509495604081013595606090910135945092505050565b5f602082840312156101cd575f5ffd5b5035919050565b808201808211156101f357634e487b7160e01b5f52601160045260245ffd5b92915050565b60808152846080820152848660a08301375f60a086830101525f60a0601f19601f8801168301019050846020830152836040830152826060830152969550505050505056fea2646970667358221220a558961cb56d6e4536a71c046fdd7db26c9b0de3b25cd7329919a40d321ddde464736f6c63430008230033"
+}

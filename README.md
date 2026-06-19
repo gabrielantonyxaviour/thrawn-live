@@ -1,25 +1,86 @@
 # Thrawn Live
 
-> An autonomous BSC trading agent that trades performance-weighted signal alpha behind a hard drawdown gate — built to survive Track 1's "most profit without blowing up" judging.
+**An autonomous BNB Smart Chain trading agent that trades performance-weighted signal alpha behind a hard drawdown gate.** Built for the **BNB Hack: AI Trading Agent Edition** (CoinMarketCap × Trust Wallet × BNB Chain).
 
-Built for **BNB AI Trading Agent Edition**.
+> Track 1 is scored on *"most profit without blowing up"* — total return with a max-drawdown cap as a hard DQ. Thrawn Live's edge is the **drawdown gate**: a portfolio-level risk supervisor that de-risks to stables *before* it ever approaches the cap, then re-arms on recovery. Discipline is the differentiator.
 
-## The thesis
-Most agents in a live-PnL contest blow their drawdown cap and get DQ'd. Thrawn Live's edge isn't a fancier strategy — it's **risk discipline**: a real intra-trade drawdown gate (ported from a working signal analyzer) vetoes execution before the agent can disqualify itself, while it trades labeled caller-alpha that most entrants don't have.
+## The edge — why it doesn't blow up
 
-## Architecture (assembly of owned parts + scored sponsor tools)
+The decision loop wraps every candidate trade in a veto gate:
+
 ```
-CMC Agent Hub (data) → signal brain → decision loop (evaluate + veto)
-        → RISK GATE (live drawdown from outcome.ts; halt before the cap)
-        → Trust Wallet Agent Kit (primary signer, Agent Wallet mode) → BSC execution
-        → DecisionRegistry.sol (on-chain audit) ; identity via BNB AI Agent SDK (ERC-8004)
+CMC data → signal brain → ┌─ off-allowlist?        → REFUSE
+                          ├─ low / malformed conf?  → REFUSE
+                          ├─ invalid entry / stop?  → REFUSE
+                          ├─ drawdown gate HALTED?   → REFUSE  ← the anti-DQ edge
+                          └─ clear → size → TWAK swap → log on-chain
 ```
-Polyglot: Python (`bnbagent` identity) + TS (signer/executor + analyzer). Seam in `shared/contract.ts`.
 
-## Sponsor tools (all three = top scoring)
-- **BNB AI Agent SDK** — on-chain agent identity / Track-1 registration.
-- **Trust Wallet Agent Kit** — primary autonomous signer.
-- **CMC Agent Hub** — market data layer.
+- **Drawdown-from-peak** is tracked at the portfolio level (matching the hour-by-hour scoring), with a configurable official cap (`drawdownCapPct`, default 30 — the rules only ever say *"e.g. 30%"*) and a **conservative internal halt** (`internalHaltPct`, 20%) that trips *first*.
+- On halt → **de-risk to stables** (USDT/USDC/DAI/FDUSD/TUSD). The gate **re-arms** once drawdown recovers below `rearmPct` (10%) — without this hysteresis a single halt would brick the agent and guarantee a `≥1-trade/day` DQ.
+- A **≥1-trade/day guard** places a minimal (risk-neutral when halted) qualifying trade so the daily minimum is never silently missed.
+
+## Uses all three sponsor tools
+
+| Layer | Sponsor tool | Status |
+|---|---|---|
+| **Identity** | **BNB AI Agent SDK** (`bnbagent`, ERC-8004) | ✅ **Live on BSC testnet, gas-free via MegaFuel** — agentId **1453** |
+| **Signer / execution** | **Trust Wallet Agent Kit** (`@trustwallet/cli`, Agent Wallet mode) | Wired (`twak swap` PancakeSwap spot + `twak compete register`); needs portal creds to run |
+| **Data** | **CoinMarketCap Agent Hub** (free REST tier) | Wired (batched `quotes/latest` + Fear & Greed regime); needs a free API key to run |
+
+### On-chain proof (BSC testnet)
+
+- **ERC-8004 identity** — agentId `1453`, agent address [`0xC1c9220E874AF912d4aC26Eeb45d7fFB0c0DF6b5`](https://testnet.bscscan.com/address/0xC1c9220E874AF912d4aC26Eeb45d7fFB0c0DF6b5), registration tx [`0xe7ec77…05abf8`](https://testnet.bscscan.com/tx/0xe7ec778f291759cba3a544841e18985622d8d0f736ed6bcf66ebd5d76105abf8) (status `0x1`, `effectiveGasPrice 0` — MegaFuel-sponsored). Registry `0x8004A818BFB912233c491871b3d84c89A494BD9e`. See [`proof/identity-testnet.json`](proof/identity-testnet.json).
+
+## Architecture (polyglot, contract-first)
+
+```
+shared/contract.ts            the seam (Signal, RiskGate, AgentDecision, Execution, services)
+shared/eligible-tokens.json   the 149-token BSC allowlist (trades outside don't count)
+
+agent/  (TypeScript — the live loop)
+  src/gate.ts      portfolio drawdown gate (peak tracking, halt + re-arm, ≥1/day)
+  src/brain.ts     the veto decision engine (allowlist + confidence + validation + gate)
+  src/sizing.ts    risk-based position sizing
+  src/loop.ts      one decision tick + the qualifying-trade guard
+  src/daemon.ts    hourly orchestration (mark-to-market → signal → gate → exec → log)
+  src/services/    live adapters: cmc · signal-source · twak · competition · decision-registry · factory
+
+bnbagent/  (Python — one-shot identity)
+  register_identity.py   ERC-8004 registration via the BNB AI Agent SDK (MegaFuel gas-free)
+
+contracts/
+  DecisionRegistry.sol   append-only on-chain provenance of every decision (deploy-ready)
+```
+
+The brain + gate + loop are identical in mock and live mode; only the IO edges (CMC / TWAK / chain) swap, selected by `THRAWN_MODE`.
+
+## Run it
+
+```bash
+npm install
+
+# 1) Mock loop — full EXECUTE / REFUSE / DERISK / RE-ARM / qualify flow, $0, no network
+npm run dev:mock
+
+# 2) Tests (gate, brain, allowlist, CMC parser, momentum)
+npm test
+
+# 3) ERC-8004 identity on BSC testnet (gas-free; Python venv per bnbagent/requirements.txt)
+BNBAGENT_WALLET_PASSWORD=... RPC_URL=https://bsc-testnet-rpc.publicnode.com \
+  bnbagent/.venv/bin/python bnbagent/register_identity.py
+
+# 4) Live daemon (needs a free CMC key; add TWAK creds for real swaps)
+THRAWN_MODE=live CMC_PRO_API_KEY=... npm run daemon
+```
+
+Config is fully env-driven (`.env.example`) — nothing is hardcoded. See [`FACTS.md`](FACTS.md) for verified deadlines/SDK facts and [`.claude/state/CURRENT_SPEC.md`](.claude/state/CURRENT_SPEC.md) for current state.
 
 ## Status
-Scaffold. Assembles `~/Documents/trading` + Agora decision engine. Build in progress. See `CLAUDE.md` / `KICKOFF.md` / `FACTS.md`.
+
+- ✅ Agent core (gate, brain, sizing, loop) — 17 tests, mock loop proven end-to-end.
+- ✅ ERC-8004 identity live on BSC testnet with verified on-chain proof.
+- ✅ Live adapters (CMC, TWAK, DecisionRegistry) behind the seam; daemon wired.
+- ⏳ Needs a free **CMC API key** + **TWAK Access ID/HMAC** to run the live loop end-to-end.
+- ⏳ `DecisionRegistry` deploy needs a one-time ~$0.01 of gas (then `recordDecision` is gas-free).
+- ⏳ Live mainnet competition registration (Jun 22–28) — a funded go/no-go.

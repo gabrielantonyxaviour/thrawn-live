@@ -11,5 +11,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["shared/**/*.ts", "agent/**/*.ts"]
+  "include": ["shared/**/*.ts", "agent/**/*.ts", "contracts/**/*.ts"]
 }

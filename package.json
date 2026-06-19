@@ -7,7 +7,12 @@
   "scripts": {
     "dev:mock": "tsx agent/src/index.ts",
     "test": "node --import tsx --test agent/test/gate.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "deploy:registry": "tsx contracts/deploy-registry.ts"
+  },
+  "dependencies": {
+    "solc": "^0.8.26",
+    "viem": "^2.21.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

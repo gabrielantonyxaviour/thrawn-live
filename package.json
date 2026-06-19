@@ -6,7 +6,8 @@
   "description": "Autonomous BSC trading agent that trades performance-weighted signal alpha behind a hard drawdown gate. BNB AI Trading Agent Edition.",
   "scripts": {
     "dev:mock": "tsx agent/src/index.ts",
-    "test": "node --import tsx --test agent/test/gate.test.ts",
+    "daemon": "tsx agent/src/daemon.ts",
+    "test": "node --import tsx --test agent/test/gate.test.ts agent/test/services.test.ts",
     "typecheck": "tsc --noEmit",
     "deploy:registry": "tsx contracts/deploy-registry.ts"
   },

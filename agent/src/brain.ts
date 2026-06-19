@@ -44,15 +44,42 @@ export function evaluate(
   if (!isEligible(signal.asset))
     return refuse(
       "off-allowlist",
-      `${signal.asset} is not in the 149-token eligible set — the trade would not count.`,
+      `${signal.asset} is not in the eligible set — the trade would not count.`,
+    );
+  if (
+    signal.entryPrice == null ||
+    !Number.isFinite(signal.entryPrice) ||
+    signal.entryPrice <= 0
+  )
+    return refuse(
+      "invalid entry",
+      `Entry price ${signal.entryPrice} is missing or non-positive — cannot size.`,
+    );
+  if (
+    !Number.isFinite(signal.confidence) ||
+    signal.confidence < 0 ||
+    signal.confidence > 1
+  )
+    return refuse(
+      "malformed confidence",
+      `Confidence ${signal.confidence} is outside [0,1] — treating the signal as malformed.`,
     );
   if (signal.confidence < MIN_CONFIDENCE)
     return refuse(
       "low confidence",
       `Confidence ${(signal.confidence * 100).toFixed(0)}% below ${(MIN_CONFIDENCE * 100).toFixed(0)}% threshold.`,
     );
-  if (signal.entryPrice == null)
-    return refuse("no entry price", "Signal lacks an entry price — cannot size.");
+  if (signal.sl != null) {
+    const wrongSide =
+      signal.direction === "LONG"
+        ? signal.sl >= signal.entryPrice
+        : signal.sl <= signal.entryPrice;
+    if (wrongSide)
+      return refuse(
+        "invalid stop",
+        `SL ${signal.sl} is on the wrong side of entry ${signal.entryPrice} for a ${signal.direction} — risk would sit in the profit zone.`,
+      );
+  }
 
   return {
     id: `decision-${signal.id}-${Date.parse(createdAt)}`,

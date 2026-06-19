@@ -5,14 +5,17 @@ import type {
   ExecutionService,
   OpenPosition,
   PortfolioSnapshot,
+  PositionSize,
   RegistryService,
   RiskConfig,
   RiskGate,
   Signal,
   TradeOrder,
 } from "../../shared/contract.js";
+import { STABLES } from "./allowlist.js";
 import { evaluate } from "./brain.js";
-import { shouldHalt, updateGate } from "./gate.js";
+import { MIN_TRADE_NOTIONAL_USD, QUALIFYING_ASSET } from "./config.js";
+import { needsQualifyingTrade, shouldHalt, updateGate } from "./gate.js";
 import { evidenceHash } from "./hash.js";
 import { calculatePositionSize } from "./sizing.js";
 
@@ -136,4 +139,62 @@ export async function runTick(
     registryTx,
     state: { gate: { ...gate, tradesToday: gate.tradesToday + 1 }, positions },
   };
+}
+
+/**
+ * Satisfies the ≥1-trade/day qualification on an otherwise quiet or halted day. When the gate is
+ * HALTED we route a RISK-NEUTRAL stable→stable swap (no new directional exposure); otherwise a
+ * minimal eligible position. Counts as the day's trade. This is the fallback that prevents a
+ * silent ≥1/day DQ — the bug the re-arm fix and this path together close.
+ */
+export async function placeQualifyingTrade(
+  state: ThrawnState,
+  services: Services,
+  config: RiskConfig,
+): Promise<TickResult> {
+  const halted = state.gate.halted;
+  const size: PositionSize = {
+    positionUnits: 0,
+    notionalUsd: MIN_TRADE_NOTIONAL_USD,
+    impliedLeverage: 1,
+    riskUsd: MIN_TRADE_NOTIONAL_USD,
+  };
+  const order: TradeOrder = {
+    asset: halted ? (STABLES[1] ?? STABLES[0]) : QUALIFYING_ASSET,
+    side: "BUY",
+    size,
+    venue: "pancakeswap",
+  };
+  const decision: AgentDecision = {
+    id: `qualify-${Date.now()}`,
+    signalId: null,
+    decision: "EXECUTE",
+    reasoningTrace: [
+      `Placing a minimal qualifying trade to satisfy ≥${config.minTradesPerDay} trade/day (halted=${halted}).`,
+      halted
+        ? `Halted → risk-neutral stable→${order.asset} swap, no new directional exposure.`
+        : `Open → minimal ${order.asset} position ($${MIN_TRADE_NOTIONAL_USD}).`,
+    ],
+    evidenceHash: evidenceHash({ qualify: true, halted, asset: order.asset }),
+    createdAt: new Date().toISOString(),
+  };
+  const execution = await services.exec.execute(decision, order);
+  const registryTx = [await services.registry.record(decision, size.notionalUsd)];
+  return {
+    decision,
+    executions: [execution],
+    registryTx,
+    // Minimal/neutral — not tracked as a risk position.
+    state: { gate: { ...state.gate, tradesToday: state.gate.tradesToday + 1 }, positions: state.positions },
+  };
+}
+
+/** Daemon hook: if the ≥1-trade/day quota is unmet, place the qualifying trade; else no-op. */
+export async function maybeQualify(
+  state: ThrawnState,
+  services: Services,
+  config: RiskConfig,
+): Promise<TickResult | null> {
+  if (!needsQualifyingTrade(state.gate, config)) return null;
+  return placeQualifyingTrade(state, services, config);
 }

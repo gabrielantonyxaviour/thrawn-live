@@ -33,24 +33,30 @@ export function updateGate(
     peakEquityUsd > 0
       ? ((peakEquityUsd - currentEquityUsd) / peakEquityUsd) * 100
       : 0;
-  const tripped = dd >= config.internalHaltPct;
+  // Hysteresis re-arm (computed on RAW dd, never the rounded display value):
+  //   - not halted → trip when dd ≥ internalHaltPct
+  //   - already halted → STAY halted until dd recovers below rearmPct, then clear.
+  // A permanent (non-re-arming) halt would brick the agent and guarantee a ≥1/day DQ.
+  const halted = prev.halted ? dd > config.rearmPct : dd >= config.internalHaltPct;
+  const newlyHalted = !prev.halted && halted;
   return {
     peakEquityUsd,
     currentEquityUsd,
     currentDrawdownPct: Number(dd.toFixed(4)),
     tradesToday: prev.tradesToday,
-    // Sticky once halted: no new risk-on entries until explicitly re-armed on recovery.
-    halted: prev.halted || tripped,
-    haltReason: prev.halted
-      ? prev.haltReason
-      : tripped
-        ? `Drawdown ${dd.toFixed(2)}% ≥ internal halt ${config.internalHaltPct}% (DQ cap ${config.drawdownCapPct}%) — de-risk to stables`
-        : undefined,
+    halted,
+    haltReason: !halted
+      ? undefined
+      : newlyHalted
+        ? `Drawdown ${dd.toFixed(2)}% ≥ internal halt ${config.internalHaltPct}% (DQ cap ${config.drawdownCapPct}%) — de-risk to stables; re-arms below ${config.rearmPct}%`
+        : prev.haltReason,
   };
 }
 
-export function shouldHalt(gate: RiskGate, config: RiskConfig): boolean {
-  return gate.halted || gate.currentDrawdownPct >= config.internalHaltPct;
+// Pure read of the authoritative halt state (decided in updateGate on raw dd) — never a
+// recomputation against the rounded display value, which would split-brain at the threshold.
+export function shouldHalt(gate: RiskGate, _config: RiskConfig): boolean {
+  return gate.halted;
 }
 
 /** ≥1-trade/day qualification guard. The daemon resets tradesToday at each UTC midnight. */

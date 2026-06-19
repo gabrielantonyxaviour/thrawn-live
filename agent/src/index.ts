@@ -7,7 +7,7 @@ import {
   mockExecutionService,
   mockRegistryService,
 } from "./mocks.js";
-import { runTick, type Services, type ThrawnState } from "./loop.js";
+import { maybeQualify, runTick, type Services, type ThrawnState } from "./loop.js";
 
 /**
  * Phase 0 — runnable mock scenario. Drives the REAL brain + gate + loop over mocked IO to
@@ -102,6 +102,24 @@ const ticks: { label: string; signal: Signal | null; equityUsd: number }[] = [
       confidence: 0.85,
     },
   },
+  {
+    label: "Drawdown recovers → gate RE-ARMS, trading resumes",
+    equityUsd: 195, // 2.5% below peak (< 10% re-arm) → halt clears
+    signal: {
+      id: 5,
+      asset: "ETH",
+      direction: "LONG",
+      entryPrice: 3000,
+      tp1: 3200,
+      tp2: null,
+      tp3: null,
+      sl: 2900,
+      leverage: null,
+      traderName: "AlphaCaller",
+      signalTime: Date.now(),
+      confidence: 0.8,
+    },
+  },
 ];
 
 console.log(`Thrawn Live — Phase 0 mock loop`);
@@ -119,6 +137,16 @@ for (const t of ticks) {
   if (res.executions.length)
     console.log(`   executions: ${res.executions.map((e) => `${e.side} ${e.asset} @${e.venue} ${e.txHash?.slice(0, 12)}…`).join(", ")}`);
   console.log(`   registry: ${res.registryTx.length} decision(s) logged | trades today: ${state.gate.tradesToday}\n`);
+}
+
+// New UTC day — the daemon resets tradesToday. Simulate a quiet day (no signals) and show the
+// ≥1-trade/day guard place a minimal qualifying trade so we never silently miss the daily minimum.
+state = { ...state, gate: { ...state.gate, tradesToday: 0 } };
+const q = await maybeQualify(state, services, config);
+if (q) {
+  state = q.state;
+  console.log(`▶ New UTC day, no signals → ≥1/day guard fires`);
+  console.log(`   decision: ${q.decision.decision} | ${q.executions.map((e) => `${e.side} ${e.asset} $${e.size.notionalUsd}`).join(", ")} | trades today: ${state.gate.tradesToday}\n`);
 }
 
 console.log(`Final: open positions ${state.positions.length}, halted=${state.gate.halted}, trades today ${state.gate.tradesToday}`);

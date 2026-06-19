@@ -62,8 +62,10 @@ export interface PositionSize {
 // metric and operates on PortfolioSnapshot history.
 // ────────────────────────────────────────────────────────────────────────────
 export interface RiskConfig {
-  drawdownCapPct: number; // official DQ cap (default 30; confirm at registration)
+  drawdownCapPct: number; // official DQ cap (default 30; off-chain judging rule, never queryable)
   internalHaltPct: number; // our halt, < cap (e.g. 20). The "never blow up" margin.
+  rearmPct: number; // hysteresis: a tripped halt CLEARS once drawdown recovers below this (< internalHaltPct).
+  // Without re-arm the halt is permanent → guaranteed ≥1-trade/day DQ on every later day.
   minTradesPerDay: number; // 1 (7 over the week) — qualification minimum
   perTradeRiskUsd: number; // -> calculatePositionSize riskUsd
   maxNotionalPerTradeUsd: number;

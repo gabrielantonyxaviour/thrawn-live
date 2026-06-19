@@ -72,7 +72,13 @@ BNBAGENT_WALLET_PASSWORD=... RPC_URL=https://bsc-testnet-rpc.publicnode.com \
 
 # 4) Live daemon (needs a free CMC key; add TWAK creds for real swaps)
 THRAWN_MODE=live CMC_PRO_API_KEY=... npm run daemon
+
+# 5) Dashboard — terminal control room (drawdown gate, decision stream, on-chain proof)
+npm run dev:mock                 # emits dashboard/public/state.json
+cd dashboard && npm install && npm run dev   # http://localhost:5174
 ```
+
+The dashboard is data-driven from `dashboard/public/state.json` (the agent emits it each run) and polls every 4s, so it reflects the live loop as it trades.
 
 Config is fully env-driven (`.env.example`) — nothing is hardcoded. See [`FACTS.md`](FACTS.md) for verified deadlines/SDK facts and [`.claude/state/CURRENT_SPEC.md`](.claude/state/CURRENT_SPEC.md) for current state.
 
@@ -81,6 +87,7 @@ Config is fully env-driven (`.env.example`) — nothing is hardcoded. See [`FACT
 - ✅ Agent core (gate, brain, sizing, loop) — 17 tests, mock loop proven end-to-end.
 - ✅ ERC-8004 identity live on BSC testnet with verified on-chain proof.
 - ✅ Live adapters (CMC, TWAK, DecisionRegistry) behind the seam; daemon wired.
+- ✅ Dashboard — terminal control room (drawdown-gate gauge, decision stream, on-chain proof), responsive.
 - ⏳ Needs a free **CMC API key** + **TWAK Access ID/HMAC** to run the live loop end-to-end.
 - ⏳ `DecisionRegistry` deploy needs a one-time ~$0.01 of gas (then `recordDecision` is gas-free).
 - ⏳ Live mainnet competition registration (Jun 22–28) — a funded go/no-go.

@@ -1,0 +1,192 @@
+{
+  "updatedAt": "2026-06-19T17:22:54.790Z",
+  "network": "bsc-testnet",
+  "mode": "mock",
+  "identity": {
+    "agentId": 1453,
+    "agentAddress": "0xC1c9220E874AF912d4aC26Eeb45d7fFB0c0DF6b5",
+    "txHash": "0xe7ec778f291759cba3a544841e18985622d8d0f736ed6bcf66ebd5d76105abf8",
+    "explorerTx": "https://testnet.bscscan.com/tx/0xe7ec778f291759cba3a544841e18985622d8d0f736ed6bcf66ebd5d76105abf8",
+    "explorerAddress": "https://testnet.bscscan.com/address/0xC1c9220E874AF912d4aC26Eeb45d7fFB0c0DF6b5",
+    "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e"
+  },
+  "risk": {
+    "drawdownCapPct": 30,
+    "internalHaltPct": 20,
+    "rearmPct": 10,
+    "startingCapitalUsd": 200,
+    "minTradesPerDay": 1
+  },
+  "gate": {
+    "peakEquityUsd": 200,
+    "currentEquityUsd": 195,
+    "currentDrawdownPct": 2.5,
+    "tradesToday": 1,
+    "halted": false
+  },
+  "equityUsd": 195,
+  "positions": [
+    {
+      "asset": "ETH",
+      "side": "BUY",
+      "entryPrice": 3000,
+      "units": 0.16666666666666666,
+      "notionalUsd": 500,
+      "txHash": "0xe030000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "qualify-1781889774790",
+      "signalId": null,
+      "decision": "EXECUTE",
+      "reasoningTrace": [
+        "Placing a minimal qualifying trade to satisfy ≥1 trade/day (halted=false).",
+        "Open → minimal CAKE position ($1)."
+      ],
+      "evidenceHash": "0xbcffa371c37147f84bf6f7ad88d27464ccac2f94a924fc3394f2ed5dc84a1add",
+      "createdAt": "2026-06-19T17:22:54.790Z",
+      "executions": [
+        {
+          "decisionId": "qualify-1781889774790",
+          "asset": "CAKE",
+          "side": "BUY",
+          "size": {
+            "positionUnits": 0,
+            "notionalUsd": 1,
+            "impliedLeverage": 1,
+            "riskUsd": 1
+          },
+          "venue": "pancakeswap",
+          "signer": "trust-wallet-agent-kit",
+          "txHash": "0xe040000000000000000000000000000000000000000000000000000000000000",
+          "status": "filled"
+        }
+      ]
+    },
+    {
+      "id": "decision-5-1781889774790",
+      "signalId": 5,
+      "decision": "EXECUTE",
+      "reasoningTrace": [
+        "Signal #5: LONG ETH from AlphaCaller @ confidence 80%.",
+        "Portfolio drawdown 2.50% vs internal halt 20% / DQ cap 30%.",
+        "Cleared all vetoes — EXECUTE LONG ETH on PancakeSwap (spot)."
+      ],
+      "evidenceHash": "0x98c5f68b49747b9b86c7c0128a3728b708f39835b87fc503a2fca041e3a814f2",
+      "createdAt": "2026-06-19T17:22:54.790Z",
+      "executions": [
+        {
+          "decisionId": "decision-5-1781889774790",
+          "asset": "ETH",
+          "side": "BUY",
+          "size": {
+            "positionUnits": 0.16666666666666666,
+            "notionalUsd": 500,
+            "impliedLeverage": 10,
+            "riskUsd": 50
+          },
+          "venue": "pancakeswap",
+          "signer": "trust-wallet-agent-kit",
+          "txHash": "0xe030000000000000000000000000000000000000000000000000000000000000",
+          "status": "filled"
+        }
+      ]
+    },
+    {
+      "id": "derisk-1781889774790",
+      "signalId": null,
+      "decision": "DERISK",
+      "reasoningTrace": [
+        "Portfolio drawdown 21.00% ≥ internal halt 20%.",
+        "De-risking 1 position(s) to stables to protect the 30% DQ cap."
+      ],
+      "refusalReason": "Drawdown 21.00% ≥ internal halt 20% (DQ cap 30%) — de-risk to stables; re-arms below 10%",
+      "evidenceHash": "0x2cb845dc13a460a0dd217e182898a72b91fd5fd31f6d559258e4dd1ad442aa7f",
+      "createdAt": "2026-06-19T17:22:54.790Z",
+      "executions": [
+        {
+          "decisionId": "derisk",
+          "asset": "ETH",
+          "side": "SELL",
+          "size": {
+            "positionUnits": 0.16666666666666666,
+            "notionalUsd": 500,
+            "impliedLeverage": 1,
+            "riskUsd": 0
+          },
+          "venue": "pancakeswap",
+          "signer": "trust-wallet-agent-kit",
+          "txHash": "0xe020000000000000000000000000000000000000000000000000000000000000",
+          "status": "filled"
+        }
+      ]
+    },
+    {
+      "id": "decision-3-1781889774789",
+      "signalId": 3,
+      "decision": "REFUSE",
+      "reasoningTrace": [
+        "Signal #3: LONG CAKE from NoiseCaller @ confidence 40%.",
+        "Portfolio drawdown 1.00% vs internal halt 20% / DQ cap 30%.",
+        "Confidence 40% below 55% threshold."
+      ],
+      "refusalReason": "low confidence",
+      "evidenceHash": "0x78cb509a311fef43e8de2c3a35201127603b45df18f788ebd21bad13165044cb",
+      "createdAt": "2026-06-19T17:22:54.789Z",
+      "executions": []
+    },
+    {
+      "id": "decision-2-1781889774789",
+      "signalId": 2,
+      "decision": "REFUSE",
+      "reasoningTrace": [
+        "Signal #2: LONG BTC from AlphaCaller @ confidence 90%.",
+        "Portfolio drawdown 0.00% vs internal halt 20% / DQ cap 30%.",
+        "BTC is not in the eligible set — the trade would not count."
+      ],
+      "refusalReason": "off-allowlist",
+      "evidenceHash": "0x0ac4928f46ed9faec5d5f314d3075b59c7e545cdb960c40f33e589ae85bc28f2",
+      "createdAt": "2026-06-19T17:22:54.789Z",
+      "executions": []
+    },
+    {
+      "id": "decision-1-1781889774788",
+      "signalId": 1,
+      "decision": "EXECUTE",
+      "reasoningTrace": [
+        "Signal #1: LONG ETH from AlphaCaller @ confidence 80%.",
+        "Portfolio drawdown 0.00% vs internal halt 20% / DQ cap 30%.",
+        "Cleared all vetoes — EXECUTE LONG ETH on PancakeSwap (spot)."
+      ],
+      "evidenceHash": "0x6b0c4332a38f5ecbc48c301cb85558a5150ed1ee150d796272b552a93a05060b",
+      "createdAt": "2026-06-19T17:22:54.788Z",
+      "executions": [
+        {
+          "decisionId": "decision-1-1781889774788",
+          "asset": "ETH",
+          "side": "BUY",
+          "size": {
+            "positionUnits": 0.16666666666666666,
+            "notionalUsd": 500,
+            "impliedLeverage": 10,
+            "riskUsd": 50
+          },
+          "venue": "pancakeswap",
+          "signer": "trust-wallet-agent-kit",
+          "txHash": "0xe010000000000000000000000000000000000000000000000000000000000000",
+          "status": "filled"
+        }
+      ]
+    }
+  ],
+  "sponsors": {
+    "cmc": "pending",
+    "trustWallet": "pending",
+    "bnbSdk": "live"
+  },
+  "competition": {
+    "registered": false,
+    "contract": "0x212c61b9b72c95d95bf29cf032f5e5635629aed5"
+  }
+}

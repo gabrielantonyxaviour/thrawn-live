@@ -35,3 +35,13 @@ the live mainnet competition is a separate, later, user-funded go/no-go.
 - [ ] DecisionRegistry deployed (tBNB-gated) + on-chain decision logging.
 - [ ] Dashboard (thin UI), README with on-chain proof, demo. DoraHacks submission.
 - [ ] (If funded) mainnet competition registration before Jun 21 17:30 IST.
+
+## Design direction (dashboard)
+- Archetype: Dark Cinematic + terminal/cockpit motifs (scanlines, 1px grid, bracket corners).
+- Dials: DESIGN_VARIANCE 3, MOTION_INTENSITY 4, VISUAL_DENSITY 8 (cockpit).
+- Type: IBM Plex Mono (numerics/hashes/headers) + IBM Plex Sans (prose). NOT Inter.
+- Palette: base #0a0c10, panel #11141a, border #1e2430; primary cyan #38bdf8; BNB-gold #F0B90B
+  (on-chain/sponsor); status armed #34d399 / caution #fbbf24 / halted #f87171.
+- Hero: the drawdown-gate gauge (dd% vs halt 20% vs cap 30%, armed/halted) — NOT stat cards.
+- Bans: no stat-card filler, no Inter, no purple gradient, no floating badges; mono numerics; real data.
+- Stack: Vite + React + TS in dashboard/, data-driven from a state JSON the agent emits.

@@ -8,6 +8,8 @@ import {
   mockRegistryService,
 } from "./mocks.js";
 import { maybeQualify, runTick, type Services, type ThrawnState } from "./loop.js";
+import type { DashboardDecision } from "../../shared/dashboard.js";
+import { buildDashboardState, writeDashboardState } from "./state.js";
 
 /**
  * Phase 0 — runnable mock scenario. Drives the REAL brain + gate + loop over mocked IO to
@@ -127,9 +129,11 @@ console.log(
   `Eligible tokens: ${ELIGIBLE_COUNT} | start $${config.startingCapitalUsd} | internal halt ${config.internalHaltPct}% | DQ cap ${config.drawdownCapPct}%\n`,
 );
 
+const decisions: DashboardDecision[] = [];
 for (const t of ticks) {
   const res = await runTick(state, t.signal, snap(t.equityUsd), services, config);
   state = res.state;
+  decisions.unshift({ ...res.decision, executions: res.executions });
   const d = res.decision;
   console.log(`▶ ${t.label}`);
   console.log(`   equity $${t.equityUsd} | drawdown ${state.gate.currentDrawdownPct.toFixed(2)}% | halted=${state.gate.halted}`);
@@ -145,8 +149,23 @@ state = { ...state, gate: { ...state.gate, tradesToday: 0 } };
 const q = await maybeQualify(state, services, config);
 if (q) {
   state = q.state;
+  decisions.unshift({ ...q.decision, executions: q.executions });
   console.log(`▶ New UTC day, no signals → ≥1/day guard fires`);
   console.log(`   decision: ${q.decision.decision} | ${q.executions.map((e) => `${e.side} ${e.asset} $${e.size.notionalUsd}`).join(", ")} | trades today: ${state.gate.tradesToday}\n`);
 }
 
 console.log(`Final: open positions ${state.positions.length}, halted=${state.gate.halted}, trades today ${state.gate.tradesToday}`);
+
+// Emit the dashboard snapshot — real on-chain identity proof + this run's gate/decisions.
+writeDashboardState(
+  buildDashboardState({
+    mode: "mock",
+    network: "bsc-testnet",
+    config,
+    state,
+    equityUsd: ticks[ticks.length - 1].equityUsd,
+    decisions,
+    sponsors: { cmc: "pending", trustWallet: "pending", bnbSdk: "live" },
+  }),
+);
+console.log("dashboard state → dashboard/public/state.json");

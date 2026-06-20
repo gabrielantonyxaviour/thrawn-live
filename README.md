@@ -88,6 +88,7 @@ Config is fully env-driven (`.env.example`) — nothing is hardcoded. See [`FACT
 - ✅ ERC-8004 identity live on BSC testnet with verified on-chain proof.
 - ✅ Live adapters (CMC, TWAK, DecisionRegistry) behind the seam; daemon wired.
 - ✅ Dashboard — terminal control room (drawdown-gate gauge, decision stream, on-chain proof), responsive.
-- ⏳ Needs a free **CMC API key** + **TWAK Access ID/HMAC** to run the live loop end-to-end.
+- ✅ **CMC + TWAK credentials wired and verified live** (live BNB quote; `twak auth` configured). TWAK Agent Wallet `0x73Eb9f04EB62708b2449988175db9d3C5541Bd7B` created + backend-registered.
+- ⏳ On-chain `twak compete register` needs ~$0.01 BNB gas on the agent wallet — registration is open until **Jun 25** on-chain (per the competition contract).
 - ⏳ `DecisionRegistry` deploy needs a one-time ~$0.01 of gas (then `recordDecision` is gas-free).
-- ⏳ Live mainnet competition registration (Jun 22–28) — a funded go/no-go.
+- ⏳ Live mainnet trading (Jun 22–28) — a funded go/no-go.

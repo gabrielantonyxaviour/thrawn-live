@@ -1,7 +1,8 @@
 # Thrawn Live — verified build facts (checked 2026-06-19)
 
 ## Deadlines / rules — CONFIRMED against the LIVE DoraHacks rules page (2026-06-19)
-- Build + submission window **Jun 3 → Jun 21, 2026**. **Hard lock = Jun 21 12:00 UTC = 17:30 IST.** Live page shows "Deadline 2026/06/21 19:00" (DoraHacks UTC+7) and header "1 day left for submission" as of 2026-06-19. **Track 1: register on-chain BEFORE the trading window opens Jun 22** — entries after it opens are rejected.
+- **DoraHacks BUIDL/submission lock = Jun 21 12:00 UTC = 17:30 IST** (public repo + submission form). Live page shows "Deadline 2026/06/21 19:00" (DoraHacks UTC+7).
+- **CORRECTION (authoritative, on-chain):** `twak compete status` reads the competition contract directly — registration `deadline = 2026-06-25T00:00:00Z`, `opensAt = 2026-06-02T21:15:14Z`, currently `open: true`. So **on-chain registration is accepted until Jun 25**, NOT "before Jun 22" (the page prose was conservative). The contract value is the one that's enforced. Trading window Jun 22–28 still stands.
 - Track 1 live trading **Jun 22–28**, judged on live PnL / total return, hour-by-hour. Judging Jun 29–Jul 5, winners week of Jul 6.
 - **≥1 trade/day** (7 over the week) minimum to qualify. Must hold a **non-zero balance of in-scope assets at competition start** to be ranked.
 - **Any hour beginning with portfolio ≤ $1 is scored 0% for that hour** — don't get drained to dust; keep capital deployed.
@@ -23,6 +24,12 @@
 - **TWAK (CLI-confirmed):** needs `TWAK_ACCESS_ID`+`TWAK_HMAC_SECRET` for **EVERYTHING** (even read-only) → portal creds are the single hard blocker. **Cannot import OR export a wallet** (only `create`/`connect`) → can't share one key with bnbagent. **Architecture decision: bnbagent registers ERC-8004 identity on ITS OWN testnet wallet (sponsor points, self-serve now); TWAK `wallet create` mints a SEPARATE trading/competition wallet (creds-gated).** Two linked addresses, documented. `twak compete register/status` is **BSC-MAINNET-ONLY** (hard-coded, no testnet) → real competition entry needs mainnet + small real BNB. `compete status --json` exposes `registrationDeadline()` (cross-check vs Jun 21 12:00 UTC) but **NOT** any drawdown cap.
 - **Drawdown cap — FULLY RESOLVED:** the word "drawdown" appears **0 times** in the TWAK CLI bundle and is **absent from the competition contract ABI**. It is an **off-chain judging rule** ("e.g. 30%"), never queryable on-chain. **Our gate is the sole enforcement** — config-driven `drawdownCapPct` (default 30) + conservative `internalHaltPct` (20%) with re-arm. Do not expect any tool to report it.
 - **CMC free Basic tier** has NO intraday OHLCV → `outcome.ts` candle excursion math can't run live off CMC; it powers OFFLINE caller-weighting only. Live drawdown = portfolio-level from equity snapshots (gate.ts). Use `/v1/cryptocurrency/quotes/latest?symbol=...` (1 credit/call, batch the watchlist) + `/v1/cryptocurrency/map` to resolve symbols→ids by BEP-20 contract (collision-proof).
+
+## Live integration state (creds wired 2026-06-20)
+- **CMC** — key verified LIVE (error_code 0; BNB quote returned). Data layer is live.
+- **TWAK** — `twak auth status` configured (source=environment). Agent Wallet created: **`0x73Eb9f04EB62708b2449988175db9d3C5541Bd7B`** (BSC), backend-registered (25 chains). Creds + wallet password in vault (`THRAWN_TWAK_*`) + gitignored `.env`.
+- **`twak compete register`** → fails with `insufficient funds for gas` (wants ~0.0000037 BNB; wallet has 0). MegaFuel did NOT sponsor it (fell back to self-paid). TWAK can't export the key, so ONLY `0x73Eb…Bd7B` can sign it — no gas-free route for the competition entry (unlike ERC-8004). **Blocker = ~$0.01 of real BNB on that wallet.** Then `twak compete register` completes the on-chain entry.
+- The live daemon (`THRAWN_MODE=live`) runs real CMC data → momentum signals → gate. Execution via `twak swap` needs mainnet liquidity + funds; without them, EXECUTE attempts fail cleanly (no position/trade counted — loop guards on `status==="filled"`).
 
 ## Reusable assets (verified by reading the repos)
 - `trading/src/market/outcome.ts` — `evaluateSignal(SignalRow)`; computes `max_loss_pct` / `max_profit_pct` intra-trade excursion + `final_pnl_pct`. **This is your live drawdown math.** Feeds: Binance (crypto, klines) → Yahoo fallback. `getPriceAt(asset, ts)`.

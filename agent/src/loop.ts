@@ -122,6 +122,12 @@ export async function runTick(
   const execution = await services.exec.execute(decision, order);
   executions.push(execution);
 
+  // A swap that didn't fill (insufficient funds / no route) must NOT open a position or count
+  // toward the ≥1/day quota — otherwise the gate and trade count diverge from on-chain reality.
+  if (execution.status !== "filled") {
+    return { decision, executions, registryTx, state: { gate, positions: state.positions } };
+  }
+
   const positions: OpenPosition[] = [
     ...state.positions,
     {
@@ -179,13 +185,18 @@ export async function placeQualifyingTrade(
     createdAt: new Date().toISOString(),
   };
   const execution = await services.exec.execute(decision, order);
+  const filled = execution.status === "filled";
   const registryTx = [await services.registry.record(decision, size.notionalUsd)];
   return {
     decision,
     executions: [execution],
     registryTx,
-    // Minimal/neutral — not tracked as a risk position.
-    state: { gate: { ...state.gate, tradesToday: state.gate.tradesToday + 1 }, positions: state.positions },
+    // Only a FILLED qualifying swap counts toward ≥1/day — a failed one must not (else the agent
+    // believes the daily minimum is met when it isn't, risking DQ). Minimal/neutral, no position.
+    state: {
+      gate: { ...state.gate, tradesToday: filled ? state.gate.tradesToday + 1 : state.gate.tradesToday },
+      positions: state.positions,
+    },
   };
 }
 

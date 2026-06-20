@@ -165,7 +165,12 @@ writeDashboardState(
     state,
     equityUsd: ticks[ticks.length - 1].equityUsd,
     decisions,
-    sponsors: { cmc: "pending", trustWallet: "pending", bnbSdk: "live" },
+    sponsors: {
+      cmc: process.env.CMC_PRO_API_KEY ? "live" : "pending",
+      trustWallet:
+        process.env.TWAK_ACCESS_ID && process.env.TWAK_HMAC_SECRET ? "live" : "pending",
+      bnbSdk: "live", // ERC-8004 identity registered on-chain (proof/identity-testnet.json)
+    },
   }),
 );
 console.log("dashboard state → dashboard/public/state.json");

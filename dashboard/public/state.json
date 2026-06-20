@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-19T17:22:54.790Z",
+  "updatedAt": "2026-06-20T03:48:19.956Z",
   "network": "bsc-testnet",
   "mode": "mock",
   "identity": {
@@ -37,7 +37,7 @@
   ],
   "decisions": [
     {
-      "id": "qualify-1781889774790",
+      "id": "qualify-1781927299956",
       "signalId": null,
       "decision": "EXECUTE",
       "reasoningTrace": [
@@ -45,10 +45,10 @@
         "Open → minimal CAKE position ($1)."
       ],
       "evidenceHash": "0xbcffa371c37147f84bf6f7ad88d27464ccac2f94a924fc3394f2ed5dc84a1add",
-      "createdAt": "2026-06-19T17:22:54.790Z",
+      "createdAt": "2026-06-20T03:48:19.956Z",
       "executions": [
         {
-          "decisionId": "qualify-1781889774790",
+          "decisionId": "qualify-1781927299956",
           "asset": "CAKE",
           "side": "BUY",
           "size": {
@@ -65,7 +65,7 @@
       ]
     },
     {
-      "id": "decision-5-1781889774790",
+      "id": "decision-5-1781927299956",
       "signalId": 5,
       "decision": "EXECUTE",
       "reasoningTrace": [
@@ -73,11 +73,11 @@
         "Portfolio drawdown 2.50% vs internal halt 20% / DQ cap 30%.",
         "Cleared all vetoes — EXECUTE LONG ETH on PancakeSwap (spot)."
       ],
-      "evidenceHash": "0x98c5f68b49747b9b86c7c0128a3728b708f39835b87fc503a2fca041e3a814f2",
-      "createdAt": "2026-06-19T17:22:54.790Z",
+      "evidenceHash": "0x1f605b78acbb4ccc930f151a6012ee55bad64bd83af093c963f1845e869a6f27",
+      "createdAt": "2026-06-20T03:48:19.956Z",
       "executions": [
         {
-          "decisionId": "decision-5-1781889774790",
+          "decisionId": "decision-5-1781927299956",
           "asset": "ETH",
           "side": "BUY",
           "size": {
@@ -94,7 +94,7 @@
       ]
     },
     {
-      "id": "derisk-1781889774790",
+      "id": "derisk-1781927299956",
       "signalId": null,
       "decision": "DERISK",
       "reasoningTrace": [
@@ -103,7 +103,7 @@
       ],
       "refusalReason": "Drawdown 21.00% ≥ internal halt 20% (DQ cap 30%) — de-risk to stables; re-arms below 10%",
       "evidenceHash": "0x2cb845dc13a460a0dd217e182898a72b91fd5fd31f6d559258e4dd1ad442aa7f",
-      "createdAt": "2026-06-19T17:22:54.790Z",
+      "createdAt": "2026-06-20T03:48:19.956Z",
       "executions": [
         {
           "decisionId": "derisk",
@@ -123,7 +123,7 @@
       ]
     },
     {
-      "id": "decision-3-1781889774789",
+      "id": "decision-3-1781927299956",
       "signalId": 3,
       "decision": "REFUSE",
       "reasoningTrace": [
@@ -132,12 +132,12 @@
         "Confidence 40% below 55% threshold."
       ],
       "refusalReason": "low confidence",
-      "evidenceHash": "0x78cb509a311fef43e8de2c3a35201127603b45df18f788ebd21bad13165044cb",
-      "createdAt": "2026-06-19T17:22:54.789Z",
+      "evidenceHash": "0xb88c77474c5ff493c2a7a85679034a725f05e120ea5c0602766a3dd233ab7ce5",
+      "createdAt": "2026-06-20T03:48:19.956Z",
       "executions": []
     },
     {
-      "id": "decision-2-1781889774789",
+      "id": "decision-2-1781927299956",
       "signalId": 2,
       "decision": "REFUSE",
       "reasoningTrace": [
@@ -146,12 +146,12 @@
         "BTC is not in the eligible set — the trade would not count."
       ],
       "refusalReason": "off-allowlist",
-      "evidenceHash": "0x0ac4928f46ed9faec5d5f314d3075b59c7e545cdb960c40f33e589ae85bc28f2",
-      "createdAt": "2026-06-19T17:22:54.789Z",
+      "evidenceHash": "0x72a853849219da6c6475a375336174d203bff38a041770687788291ce1c09185",
+      "createdAt": "2026-06-20T03:48:19.956Z",
       "executions": []
     },
     {
-      "id": "decision-1-1781889774788",
+      "id": "decision-1-1781927299955",
       "signalId": 1,
       "decision": "EXECUTE",
       "reasoningTrace": [
@@ -159,11 +159,11 @@
         "Portfolio drawdown 0.00% vs internal halt 20% / DQ cap 30%.",
         "Cleared all vetoes — EXECUTE LONG ETH on PancakeSwap (spot)."
       ],
-      "evidenceHash": "0x6b0c4332a38f5ecbc48c301cb85558a5150ed1ee150d796272b552a93a05060b",
-      "createdAt": "2026-06-19T17:22:54.788Z",
+      "evidenceHash": "0xc8a746e69a44fdca78fe01e0be5b8a0f1786f4799065d04809acf2a0924cf6f4",
+      "createdAt": "2026-06-20T03:48:19.955Z",
       "executions": [
         {
-          "decisionId": "decision-1-1781889774788",
+          "decisionId": "decision-1-1781927299955",
           "asset": "ETH",
           "side": "BUY",
           "size": {
@@ -181,8 +181,8 @@
     }
   ],
   "sponsors": {
-    "cmc": "pending",
-    "trustWallet": "pending",
+    "cmc": "live",
+    "trustWallet": "live",
     "bnbSdk": "live"
   },
   "competition": {

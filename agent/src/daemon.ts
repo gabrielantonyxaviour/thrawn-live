@@ -5,6 +5,8 @@ import { initGate } from "./gate.js";
 import { maybeQualify, runTick, type ThrawnState } from "./loop.js";
 import { buildServices } from "./services/factory.js";
 import { cmcMomentumSignalSource } from "./services/signal-source.js";
+import { buildDashboardState, writeDashboardState } from "./state.js";
+import type { DashboardDecision, SponsorStatus } from "../../shared/dashboard.js";
 
 /**
  * The live orchestration: factory-selected services → CMC momentum signal → drawdown gate →
@@ -43,6 +45,24 @@ async function main() {
 
   let state: ThrawnState = { gate: initGate(RISK_CONFIG), positions: [] };
   let cashUsd = RISK_CONFIG.startingCapitalUsd;
+  const decisions: DashboardDecision[] = [];
+  const sponsors = {
+    cmc: (notes.some((n) => n.includes("CMC (live)")) ? "live" : "pending") as SponsorStatus,
+    trustWallet: (notes.some((n) => n.includes("TWAK (live)")) ? "live" : "pending") as SponsorStatus,
+    bnbSdk: "live" as SponsorStatus, // ERC-8004 identity registered (proof/identity-testnet.json)
+  };
+  const emit = (equityUsd: number) =>
+    writeDashboardState(
+      buildDashboardState({
+        mode,
+        network: process.env.THRAWN_NETWORK ?? "bsc-testnet",
+        config: RISK_CONFIG,
+        state,
+        equityUsd,
+        decisions,
+        sponsors,
+      }),
+    );
 
   const markToMarket = async (positions: OpenPosition[]): Promise<number> => {
     let held = 0;
@@ -62,10 +82,13 @@ async function main() {
     const signal = await source.next();
     const res = await runTick(state, signal, snapshot, services, RISK_CONFIG);
     state = res.state;
-    // track cash from executions (BUY spends, SELL/DERISK returns marked value)
+    // track cash from FILLED executions only (BUY spends, SELL/DERISK returns marked value)
     for (const e of res.executions) {
-      cashUsd += e.side === "BUY" ? -e.size.notionalUsd : e.size.notionalUsd;
+      if (e.status === "filled")
+        cashUsd += e.side === "BUY" ? -e.size.notionalUsd : e.size.notionalUsd;
     }
+    decisions.unshift({ ...res.decision, executions: res.executions });
+    emit(equityUsd);
     console.log(
       `tick ${i + 1}/${TICKS}: equity=$${equityUsd.toFixed(2)} dd=${state.gate.currentDrawdownPct.toFixed(2)}% ` +
         `halted=${state.gate.halted} → ${res.decision.decision}${res.decision.refusalReason ? ` (${res.decision.refusalReason})` : ""} ` +
@@ -78,9 +101,12 @@ async function main() {
   const q = await maybeQualify(state, services, RISK_CONFIG);
   if (q) {
     state = q.state;
+    decisions.unshift({ ...q.decision, executions: q.executions });
     console.log(`≥1/day guard → qualifying trade $${MIN_TRADE_NOTIONAL_USD} (trades today: ${state.gate.tradesToday})`);
   }
+  emit(cashUsd + (await markToMarket(state.positions)));
   console.log(`done — positions=${state.positions.length} halted=${state.gate.halted} trades=${state.gate.tradesToday}`);
+  console.log("dashboard state → dashboard/public/state.json");
 }
 
 main().catch((e) => {
